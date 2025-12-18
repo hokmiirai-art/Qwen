@@ -1,16 +1,16 @@
 jQuery(document).ready(function($) {
-    // Handle sending verification SMS
+    // مدیریت ارسال پیامک تأیید
     $('#send_verification_code, #send_verification_btn').click(function() {
         var phoneNumber = $('#phone_number, #phone_number_field').val();
         
         if (!phoneNumber) {
-            alert('Please enter your phone number');
+            alert('لطفاً شماره تلفن خود را وارد کنید');
             return;
         }
         
-        // Disable button during request
+        // غیرفعال کردن دکمه در حین درخواست
         $(this).prop('disabled', true);
-        $(this).text('Sending...');
+        $(this).text('در حال ارسال...');
         
         $.ajax({
             url: ajax_object.ajax_url,
@@ -24,38 +24,39 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     $('#verification_status, #verification_message').html('<span style="color: green;">' + response.data.message + '</span>');
                 } else {
-                    $('#verification_status, #verification_message').html('<span style="color: red;">Error: ' + response.data.message + '</span>');
+                    $('#verification_status, #verification_message').html('<span style="color: red;">خطا: ' + response.data.message + '</span>');
                 }
             },
-            error: function() {
-                $('#verification_status, #verification_message').html('<span style="color: red;">An error occurred while sending the SMS</span>');
+            error: function(xhr, status, error) {
+                console.log('خطا در ارسال AJAX:', error);
+                $('#verification_status, #verification_message').html('<span style="color: red;">خطایی در ارسال پیامک رخ داد</span>');
             },
             complete: function() {
-                // Re-enable button
+                // فعال کردن دوباره دکمه
                 $('#send_verification_code, #send_verification_btn').prop('disabled', false);
-                $('#send_verification_code, #send_verification_btn').text('Send Verification Code');
+                $('#send_verification_code, #send_verification_btn').text('ارسال کد تأیید');
             }
         });
     });
     
-    // Handle verifying the SMS code
+    // مدیریت تأیید کد پیامک
     $('#verify_code_btn').click(function() {
         var phoneNumber = $('#phone_number_field').val();
         var verificationCode = $('#verification_code_field').val();
         
         if (!phoneNumber) {
-            alert('Please enter your phone number');
+            alert('لطفاً شماره تلفن خود را وارد کنید');
             return;
         }
         
         if (!verificationCode) {
-            alert('Please enter the verification code');
+            alert('لطفاً کد تأیید را وارد کنید');
             return;
         }
         
-        // Disable button during request
+        // غیرفعال کردن دکمه در حین درخواست
         $(this).prop('disabled', true);
-        $(this).text('Verifying...');
+        $(this).text('در حال تأیید...');
         
         $.ajax({
             url: ajax_object.ajax_url,
@@ -70,41 +71,42 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     $('#result_message').html('<span style="color: green;">' + response.data.message + '</span>');
                     
-                    // Automatically create the user after successful verification
+                    // ایجاد کاربر به صورت خودکار پس از تأیید موفق
                     createUser(phoneNumber, verificationCode);
                 } else {
-                    $('#result_message').html('<span style="color: red;">Error: ' + response.data.message + '</span>');
+                    $('#result_message').html('<span style="color: red;">خطا: ' + response.data.message + '</span>');
                 }
             },
-            error: function() {
-                $('#result_message').html('<span style="color: red;">An error occurred during verification</span>');
+            error: function(xhr, status, error) {
+                console.log('خطا در تأیید AJAX:', error);
+                $('#result_message').html('<span style="color: red;">خطایی در تأیید کد رخ داد</span>');
             },
             complete: function() {
-                // Re-enable button
+                // فعال کردن دوباره دکمه
                 $('#verify_code_btn').prop('disabled', false);
-                $('#verify_code_btn').text('Verify Code');
+                $('#verify_code_btn').text('تأیید کد');
             }
         });
     });
     
-    // Handle form submission for registration
+    // مدیریت ارسال فرم برای ثبت‌نام
     $('form[name="registerform"], #sms-verification-form').submit(function(e) {
         var phoneNumber = $('#phone_number, #phone_number_field').val();
         var verificationCode = $('#verification_code, #verification_code_field').val();
         
         if (!phoneNumber) {
-            alert('Please enter your phone number');
+            alert('لطفاً شماره تلفن خود را وارد کنید');
             e.preventDefault();
             return false;
         }
         
         if (!verificationCode) {
-            alert('Please enter the verification code');
+            alert('لطفاً کد تأیید را وارد کنید');
             e.preventDefault();
             return false;
         }
         
-        // We'll handle the user creation via AJAX after successful verification
+        // ما کاربر را از طریق AJAX پس از تأیید موفق ایجاد خواهیم کرد
         e.preventDefault();
         
         createUser(phoneNumber, verificationCode);
@@ -123,24 +125,25 @@ function createUser(phoneNumber, verificationCode) {
         },
         success: function(response) {
             if (response.success) {
-                jQuery('#result_message').html('<span style="color: green;">User created successfully! You can now log in.</span>');
+                jQuery('#result_message').html('<span style="color: green;">کاربر با موفقیت ایجاد شد! می‌توانید وارد شوید.</span>');
                 
-                // Redirect to login page after a delay
+                // تغییر مسیر به صفحه ورود پس از یک مکث
                 setTimeout(function() {
                     window.location.href = '/wp-login.php';
                 }, 2000);
             } else {
-                jQuery('#result_message').html('<span style="color: red;">Error: ' + response.data.message + '</span>');
+                jQuery('#result_message').html('<span style="color: red;">خطا: ' + response.data.message + '</span>');
             }
         },
-        error: function() {
-            jQuery('#result_message').html('<span style="color: red;">An error occurred while creating the user</span>');
+        error: function(xhr, status, error) {
+            console.log('خطا در ایجاد کاربر AJAX:', error);
+            jQuery('#result_message').html('<span style="color: red;">خطایی در ایجاد کاربر رخ داد</span>');
         }
     });
 }
 
-// Add AJAX handler for creating user after verification
+// افزودن مدیریت برای درخواست AJAX جهت ایجاد کاربر پس از تأیید
 jQuery(document).ready(function($) {
-    // Handle the AJAX request for creating a user after verification
-    // This is triggered after successful verification
+    // مدیریت درخواست AJAX برای ایجاد کاربر پس از تأیید
+    // این پس از تأیید موفق فعال می‌شود
 });
