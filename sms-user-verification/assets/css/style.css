@@ -1,0 +1,63 @@
+/* استایل‌های پلاگین تأیید کاربر از طریق پیامک */
+#sms-verification-form {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#sms-verification-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#sms-verification-form input[type="tel"],
+#sms-verification-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#sms-verification-form button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#sms-verification-form button:hover {
+    opacity: 0.9;
+}
+
+#verification_status, #verification_message, #result_message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.register #sms-verification-form input[type="tel"],
+.register #sms-verification-form input[type="text"] {
+    width: 25em;
+    max-width: 100%;
+}
+
+.sms-verification-error {
+    color: #dc3232;
+    font-weight: normal;
+    margin-left: 0.5em;
+    display: block;
+}
+
+.sms-verification-success {
+    color: #00aa00;
+    font-weight: normal;
+    margin-left: 0.5em;
+    display: block;
+}
